@@ -1,10 +1,13 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
@@ -58,10 +61,19 @@ const Header = () => {
               Tesouraria <ChevronDown className="inline h-3 w-3" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => navigate("/cnab-recebimentos")}>
-              CNAB Recebimentos
-            </DropdownMenuItem>
+          <DropdownMenuContent align="start" className="w-52">
+            <DropdownMenuItem>Parametrização</DropdownMenuItem>
+            <DropdownMenuItem>Pagamentos</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Recebimentos</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => navigate("/cnab-recebimentos")}>
+                  CNAB Recebimentos
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuItem>Lançamentos Contábeis</DropdownMenuItem>
+            <DropdownMenuItem>Repasse Cobrança</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -75,5 +87,4 @@ const Header = () => {
     </header>
   );
 };
-
 export default Header;
