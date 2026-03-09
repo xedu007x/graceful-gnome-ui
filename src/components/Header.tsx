@@ -1,18 +1,31 @@
 import { ChevronDown } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <header className="bg-brand-dark">
       <div className="container flex items-center justify-between py-3">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded bg-brand flex items-center justify-center">
-              <span className="text-brand-foreground font-bold text-lg">G</span>
-            </div>
-            <div>
-              <h1 className="text-brand-foreground font-bold text-sm leading-tight">DESENVOLVE SP</h1>
-              <p className="text-brand-foreground/70 text-[10px]">A AGÊNCIA DO EMPREENDEDOR</p>
-            </div>
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          <div className="h-10 w-10 rounded bg-brand flex items-center justify-center">
+            <span className="text-brand-foreground font-bold text-lg">G</span>
+          </div>
+          <div>
+            <h1 className="text-brand-foreground font-bold text-sm leading-tight">DESENVOLVE SP</h1>
+            <p className="text-brand-foreground/70 text-[10px]">A AGÊNCIA DO EMPREENDEDOR</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -23,11 +36,35 @@ const Header = () => {
         </div>
       </div>
       <nav className="container flex items-center gap-6 pb-2">
-        {["Contrato", "Ofícios", "Relatório", "Tesouraria"].map((item) => (
-          <button key={item} className="text-brand-foreground/90 text-sm hover:text-brand-foreground transition-colors">
-            {item} {["Ofícios", "Tesouraria"].includes(item) && <ChevronDown className="inline h-3 w-3" />}
-          </button>
-        ))}
+        <button
+          onClick={() => navigate("/")}
+          className={`text-sm transition-colors ${isActive("/") ? "text-brand-foreground font-semibold" : "text-brand-foreground/90 hover:text-brand-foreground"}`}
+        >
+          Início
+        </button>
+        <button className="text-brand-foreground/90 text-sm hover:text-brand-foreground transition-colors">
+          Contrato
+        </button>
+        <button className="text-brand-foreground/90 text-sm hover:text-brand-foreground transition-colors">
+          Ofícios <ChevronDown className="inline h-3 w-3" />
+        </button>
+        <button className="text-brand-foreground/90 text-sm hover:text-brand-foreground transition-colors">
+          Relatório
+        </button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className={`text-sm transition-colors ${isActive("/cnab-recebimentos") ? "text-brand-foreground font-semibold" : "text-brand-foreground/90 hover:text-brand-foreground"}`}>
+              Tesouraria <ChevronDown className="inline h-3 w-3" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => navigate("/cnab-recebimentos")}>
+              CNAB Recebimentos
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <div className="ml-auto flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
             <span className="text-xs text-muted-foreground">👤</span>
