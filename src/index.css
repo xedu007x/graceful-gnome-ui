@@ -38,6 +38,14 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    --brand: 180 60% 25%;
+    --brand-foreground: 0 0% 100%;
+    --brand-dark: 180 70% 18%;
+    --warning: 30 90% 50%;
+    --warning-foreground: 0 0% 100%;
+    --success: 145 60% 40%;
+    --success-foreground: 0 0% 100%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
