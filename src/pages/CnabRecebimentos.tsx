@@ -156,7 +156,7 @@ const CnabRecebimentos = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {dadosMock.map((row) => {
+              {dados.map((row) => {
                 const isSelected = selectedIds.has(row.id);
                 return (
                   <TableRow
@@ -174,6 +174,7 @@ const CnabRecebimentos = () => {
                     <TableCell className="text-sm">{row.cliente}</TableCell>
                     <TableCell className="text-sm">{formatCurrency(row.valor)}</TableCell>
                     <TableCell className="text-sm">{row.bacia}</TableCell>
+                    <TableCell className="text-sm">{row.dataImportacao}</TableCell>
                     <TableCell>
                       <span className="font-bold text-warning">{row.status}</span>
                     </TableCell>
