@@ -142,7 +142,7 @@ const CnabRecebimentos = () => {
               <TableRow className="bg-brand-dark hover:bg-brand-dark">
                 <TableHead className="w-12 text-brand-foreground">
                   <Checkbox
-                    checked={selectedIds.size === dadosMock.length}
+                    checked={dados.length > 0 && selectedIds.size === dados.length}
                     onCheckedChange={toggleAll}
                     className="border-brand-foreground/50 data-[state=checked]:bg-brand data-[state=checked]:border-brand"
                   />
