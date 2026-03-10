@@ -101,40 +101,70 @@ const CnabRecebimentos = () => {
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
-          <Select>
+          <Select value={filtroTipo} onValueChange={setFiltroTipo}>
             <SelectTrigger className="w-48 bg-background">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Filtrar por..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pendente">PENDENTE</SelectItem>
-              <SelectItem value="processado">PROCESSADO</SelectItem>
+              <SelectItem value="pendente">Status: PENDENTE</SelectItem>
+              <SelectItem value="processado">Status: PROCESSADO</SelectItem>
+              <SelectItem value="data-importacao">Data de Importação</SelectItem>
             </SelectContent>
           </Select>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-52 justify-start text-left font-normal",
-                  !dataImportacao && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dataImportacao ? format(dataImportacao, "dd/MM/yyyy") : "Data de Importação"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dataImportacao}
-                onSelect={setDataImportacao}
-                initialFocus
-                locale={pt}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
+          {filtroTipo === "data-importacao" && (
+            <>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-44 justify-start text-left font-normal",
+                      !dataInicio && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dataInicio ? format(dataInicio, "dd/MM/yyyy") : "Data Início"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dataInicio}
+                    onSelect={setDataInicio}
+                    initialFocus
+                    locale={pt}
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-44 justify-start text-left font-normal",
+                      !dataFim && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dataFim ? format(dataFim, "dd/MM/yyyy") : "Data Fim"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dataFim}
+                    onSelect={setDataFim}
+                    initialFocus
+                    locale={pt}
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </>
+          )}
 
           <Select defaultValue="pendente">
             <SelectTrigger className="w-48 bg-background">
