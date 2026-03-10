@@ -109,6 +109,31 @@ const CnabRecebimentos = () => {
             </SelectContent>
           </Select>
 
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-52 justify-start text-left font-normal",
+                  !dataImportacao && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dataImportacao ? format(dataImportacao, "dd/MM/yyyy") : "Data de Importação"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dataImportacao}
+                onSelect={setDataImportacao}
+                initialFocus
+                locale={pt}
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+
           <Select defaultValue="pendente">
             <SelectTrigger className="w-48 bg-background">
               <SelectValue />
