@@ -54,6 +54,7 @@ const CnabRecebimentos = () => {
   const [dados, setDados] = useState<Transacao[]>(dadosIniciais);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [dataImportacao, setDataImportacao] = useState<Date>();
 
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) => {
