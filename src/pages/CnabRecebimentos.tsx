@@ -26,6 +26,7 @@ interface Transacao {
   valor: number;
   bacia: string;
   status: string;
+  dataImportacao: string;
 }
 
 const dadosMock: Transacao[] = [
