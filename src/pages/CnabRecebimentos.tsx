@@ -1,6 +1,10 @@
 import { useState, useMemo } from "react";
+import { format } from "date-fns";
+import { pt } from "date-fns/locale";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -17,7 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Home } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Home } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Transacao {
   id: number;
@@ -49,6 +54,7 @@ const CnabRecebimentos = () => {
   const [dados, setDados] = useState<Transacao[]>(dadosIniciais);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [dataImportacao, setDataImportacao] = useState<Date>();
 
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) => {
@@ -102,6 +108,31 @@ const CnabRecebimentos = () => {
               <SelectItem value="processado">PROCESSADO</SelectItem>
             </SelectContent>
           </Select>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-52 justify-start text-left font-normal",
+                  !dataImportacao && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dataImportacao ? format(dataImportacao, "dd/MM/yyyy") : "Data de Importação"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dataImportacao}
+                onSelect={setDataImportacao}
+                initialFocus
+                locale={pt}
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
 
           <Select defaultValue="pendente">
             <SelectTrigger className="w-48 bg-background">
