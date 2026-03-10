@@ -46,6 +46,7 @@ const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const CnabRecebimentos = () => {
+  const [dados, setDados] = useState<Transacao[]>(dadosIniciais);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
