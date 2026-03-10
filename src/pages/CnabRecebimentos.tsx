@@ -26,25 +26,27 @@ interface Transacao {
   valor: number;
   bacia: string;
   status: string;
+  dataImportacao: string;
 }
 
-const dadosMock: Transacao[] = [
-  { id: 1, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 692318.21, bacia: "COB - CB- RB Ribeira do Iguape e Litoral Sul", status: "PENDENTE" },
-  { id: 2, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 234542.64, bacia: "COB - CB- SMG Sapucaí-Mirim / Grande", status: "PENDENTE" },
-  { id: 3, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 287099.35, bacia: "COB - CB- AT Alto Tietê", status: "PENDENTE" },
-  { id: 4, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 298409.08, bacia: "COB - CB- BPG Baixo Pardo / Grande", status: "PENDENTE" },
-  { id: 5, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 203154.14, bacia: "COB - CB- BT Baixo Tietê", status: "PENDENTE" },
-  { id: 6, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 183845.06, bacia: "COB - CB- PARDO Pardo", status: "PENDENTE" },
-  { id: 7, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 1032894.76, bacia: "COB - CB- TJ Tietê-Jacaré", status: "PENDENTE" },
-  { id: 8, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 348533.42, bacia: "COB - CB- AP Aquapeí e Peixe", status: "PENDENTE" },
-  { id: 9, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 414418.87, bacia: "COB - CB- TG Turvo / Grande", status: "PENDENTE" },
-  { id: 10, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 460810.88, bacia: "COB - CB- PS Paraíba do Sul", status: "PENDENTE" },
+const dadosIniciais: Transacao[] = [
+  { id: 1, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 692318.21, bacia: "COB - CB- RB Ribeira do Iguape e Litoral Sul", status: "PENDENTE", dataImportacao: "05/03/2026" },
+  { id: 2, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 234542.64, bacia: "COB - CB- SMG Sapucaí-Mirim / Grande", status: "PENDENTE", dataImportacao: "05/03/2026" },
+  { id: 3, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 287099.35, bacia: "COB - CB- AT Alto Tietê", status: "PENDENTE", dataImportacao: "04/03/2026" },
+  { id: 4, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 298409.08, bacia: "COB - CB- BPG Baixo Pardo / Grande", status: "PENDENTE", dataImportacao: "04/03/2026" },
+  { id: 5, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 203154.14, bacia: "COB - CB- BT Baixo Tietê", status: "PENDENTE", dataImportacao: "03/03/2026" },
+  { id: 6, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 183845.06, bacia: "COB - CB- PARDO Pardo", status: "PENDENTE", dataImportacao: "03/03/2026" },
+  { id: 7, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 1032894.76, bacia: "COB - CB- TJ Tietê-Jacaré", status: "PENDENTE", dataImportacao: "02/03/2026" },
+  { id: 8, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 348533.42, bacia: "COB - CB- AP Aquapeí e Peixe", status: "PENDENTE", dataImportacao: "02/03/2026" },
+  { id: 9, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 414418.87, bacia: "COB - CB- TG Turvo / Grande", status: "PENDENTE", dataImportacao: "01/03/2026" },
+  { id: 10, transacao: "RECEBIMENTO DE BOLETOS COBRANÇA", cliente: "Banco do Brasil S.A.", valor: 460810.88, bacia: "COB - CB- PS Paraíba do Sul", status: "PENDENTE", dataImportacao: "01/03/2026" },
 ];
 
 const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const CnabRecebimentos = () => {
+  const [dados, setDados] = useState<Transacao[]>(dadosIniciais);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -58,16 +60,21 @@ const CnabRecebimentos = () => {
   };
 
   const toggleAll = () => {
-    if (selectedIds.size === dadosMock.length) {
+    if (selectedIds.size === dados.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(dadosMock.map((d) => d.id)));
+      setSelectedIds(new Set(dados.map((d) => d.id)));
     }
   };
 
+  const excluirPendentes = () => {
+    setDados((prev) => prev.filter((d) => d.status !== "PENDENTE"));
+    setSelectedIds(new Set());
+  };
+
   const valorTotalSelecionado = useMemo(
-    () => dadosMock.filter((d) => selectedIds.has(d.id)).reduce((sum, d) => sum + d.valor, 0),
-    [selectedIds]
+    () => dados.filter((d) => selectedIds.has(d.id)).reduce((sum, d) => sum + d.valor, 0),
+    [selectedIds, dados]
   );
 
   return (
@@ -110,6 +117,9 @@ const CnabRecebimentos = () => {
           </Button>
           <Button variant="outline" className="px-6">Importar</Button>
           <Button variant="outline" className="px-6">Enviar todas</Button>
+          <Button className="bg-destructive text-destructive-foreground hover:bg-destructive/90 px-6" onClick={excluirPendentes}>
+            Excluir Importação
+          </Button>
         </div>
 
         {/* Summary - aligned left */}
@@ -132,7 +142,7 @@ const CnabRecebimentos = () => {
               <TableRow className="bg-brand-dark hover:bg-brand-dark">
                 <TableHead className="w-12 text-brand-foreground">
                   <Checkbox
-                    checked={selectedIds.size === dadosMock.length}
+                    checked={dados.length > 0 && selectedIds.size === dados.length}
                     onCheckedChange={toggleAll}
                     className="border-brand-foreground/50 data-[state=checked]:bg-brand data-[state=checked]:border-brand"
                   />
@@ -141,11 +151,12 @@ const CnabRecebimentos = () => {
                 <TableHead className="text-brand-foreground font-semibold">Cliente</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Valor (R$)</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Bacia</TableHead>
+                <TableHead className="text-brand-foreground font-semibold">Data da Importação</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {dadosMock.map((row) => {
+              {dados.map((row) => {
                 const isSelected = selectedIds.has(row.id);
                 return (
                   <TableRow
@@ -163,6 +174,7 @@ const CnabRecebimentos = () => {
                     <TableCell className="text-sm">{row.cliente}</TableCell>
                     <TableCell className="text-sm">{formatCurrency(row.valor)}</TableCell>
                     <TableCell className="text-sm">{row.bacia}</TableCell>
+                    <TableCell className="text-sm">{row.dataImportacao}</TableCell>
                     <TableCell>
                       <span className="font-bold text-warning">{row.status}</span>
                     </TableCell>
