@@ -148,10 +148,10 @@ const CnabRecebimentos = () => {
                   />
                 </TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Transação</TableHead>
+                <TableHead className="text-brand-foreground font-semibold">Data da Importação</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Cliente</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Valor (R$)</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Bacia</TableHead>
-                <TableHead className="text-brand-foreground font-semibold">Data da Importação</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -171,10 +171,10 @@ const CnabRecebimentos = () => {
                       />
                     </TableCell>
                     <TableCell className="font-medium text-sm">{row.transacao}</TableCell>
+                    <TableCell className="text-sm">{row.dataImportacao}</TableCell>
                     <TableCell className="text-sm">{row.cliente}</TableCell>
                     <TableCell className="text-sm">{formatCurrency(row.valor)}</TableCell>
                     <TableCell className="text-sm">{row.bacia}</TableCell>
-                    <TableCell className="text-sm">{row.dataImportacao}</TableCell>
                     <TableCell>
                       <span className="font-bold text-warning">{row.status}</span>
                     </TableCell>
