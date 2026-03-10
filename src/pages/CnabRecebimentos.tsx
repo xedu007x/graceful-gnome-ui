@@ -151,6 +151,7 @@ const CnabRecebimentos = () => {
                 <TableHead className="text-brand-foreground font-semibold">Cliente</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Valor (R$)</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Bacia</TableHead>
+                <TableHead className="text-brand-foreground font-semibold">Data da Importação</TableHead>
                 <TableHead className="text-brand-foreground font-semibold">Status</TableHead>
               </TableRow>
             </TableHeader>
