@@ -117,6 +117,9 @@ const CnabRecebimentos = () => {
           </Button>
           <Button variant="outline" className="px-6">Importar</Button>
           <Button variant="outline" className="px-6">Enviar todas</Button>
+          <Button className="bg-destructive text-destructive-foreground hover:bg-destructive/90 px-6" onClick={excluirPendentes}>
+            Excluir Importação
+          </Button>
         </div>
 
         {/* Summary - aligned left */}
