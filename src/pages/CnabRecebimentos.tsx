@@ -60,16 +60,21 @@ const CnabRecebimentos = () => {
   };
 
   const toggleAll = () => {
-    if (selectedIds.size === dadosMock.length) {
+    if (selectedIds.size === dados.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(dadosMock.map((d) => d.id)));
+      setSelectedIds(new Set(dados.map((d) => d.id)));
     }
   };
 
+  const excluirPendentes = () => {
+    setDados((prev) => prev.filter((d) => d.status !== "PENDENTE"));
+    setSelectedIds(new Set());
+  };
+
   const valorTotalSelecionado = useMemo(
-    () => dadosMock.filter((d) => selectedIds.has(d.id)).reduce((sum, d) => sum + d.valor, 0),
-    [selectedIds]
+    () => dados.filter((d) => selectedIds.has(d.id)).reduce((sum, d) => sum + d.valor, 0),
+    [selectedIds, dados]
   );
 
   return (
