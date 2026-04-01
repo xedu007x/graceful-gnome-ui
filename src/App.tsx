@@ -8,6 +8,7 @@ import CnabRecebimentos from "./pages/CnabRecebimentos.tsx";
 import ConsultaContratos from "./pages/ConsultaContratos.tsx";
 import VisualizacaoContrato from "./pages/VisualizacaoContrato.tsx";
 import ConsultaOficios from "./pages/ConsultaOficios.tsx";
+import VisualizacaoParcela from "./pages/VisualizacaoParcela.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
