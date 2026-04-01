@@ -45,12 +45,32 @@ const Header = () => {
         >
           Início
         </button>
-        <button className="text-brand-foreground/90 text-sm hover:text-brand-foreground transition-colors">
+        <button
+          onClick={() => navigate("/contratos")}
+          className={`text-sm transition-colors ${isActive("/contratos") || location.pathname.startsWith("/contrato/") ? "text-brand-foreground font-semibold" : "text-brand-foreground/90 hover:text-brand-foreground"}`}
+        >
           Contrato
         </button>
-        <button className="text-brand-foreground/90 text-sm hover:text-brand-foreground transition-colors">
-          Ofícios <ChevronDown className="inline h-3 w-3" />
-        </button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className={`text-sm transition-colors ${isActive("/oficios") ? "text-brand-foreground font-semibold" : "text-brand-foreground/90 hover:text-brand-foreground"}`}>
+              Ofícios <ChevronDown className="inline h-3 w-3" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem onClick={() => navigate("/oficios")}>Gerenciar Ofício/Parcelas</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Contas BB</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem>Contas BB</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuItem>Aprovar em Lote</DropdownMenuItem>
+            <DropdownMenuItem>Emitir termos</DropdownMenuItem>
+            <DropdownMenuItem>Relatório de Inadimplência</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <button className="text-brand-foreground/90 text-sm hover:text-brand-foreground transition-colors">
           Relatório
         </button>
