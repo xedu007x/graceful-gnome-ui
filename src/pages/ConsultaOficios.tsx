@@ -121,7 +121,7 @@ const ConsultaOficios = () => {
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => navigate(`/oficio/${item.id}/parcela/1`)}>
                         <DollarSign className="h-4 w-4 text-brand" />
                       </Button>
                       <Button variant="ghost" size="icon">
