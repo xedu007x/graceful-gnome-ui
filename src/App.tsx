@@ -8,6 +8,7 @@ import CnabRecebimentos from "./pages/CnabRecebimentos.tsx";
 import ConsultaContratos from "./pages/ConsultaContratos.tsx";
 import VisualizacaoContrato from "./pages/VisualizacaoContrato.tsx";
 import ConsultaOficios from "./pages/ConsultaOficios.tsx";
+import VisualizacaoParcela from "./pages/VisualizacaoParcela.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/contratos" element={<ConsultaContratos />} />
           <Route path="/contrato/:id" element={<VisualizacaoContrato />} />
           <Route path="/oficios" element={<ConsultaOficios />} />
+          <Route path="/oficio/:oficioId/parcela/:parcelaId" element={<VisualizacaoParcela />} />
           <Route path="/cnab-recebimentos" element={<CnabRecebimentos />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
