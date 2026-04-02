@@ -9,6 +9,8 @@ import ConsultaContratos from "./pages/ConsultaContratos.tsx";
 import VisualizacaoContrato from "./pages/VisualizacaoContrato.tsx";
 import ConsultaOficios from "./pages/ConsultaOficios.tsx";
 import VisualizacaoParcela from "./pages/VisualizacaoParcela.tsx";
+import FundoInvestimentos from "./pages/FundoInvestimentos.tsx";
+import CotasDiarias from "./pages/CotasDiarias.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
