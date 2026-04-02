@@ -82,7 +82,12 @@ const Header = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-52">
-            <DropdownMenuItem>Parametrização</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Parametrização</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => navigate("/fundo-investimentos")}>Fundo Investimentos</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
             <DropdownMenuItem>Pagamentos</DropdownMenuItem>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>Recebimentos</DropdownMenuSubTrigger>
