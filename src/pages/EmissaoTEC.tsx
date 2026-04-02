@@ -29,7 +29,7 @@ const EmissaoTEC = () => {
   const [status, setStatus] = useState("Rascunho");
 
   const contratosMatch = busca.length >= 2
-    ? contratosMsg.filter(c =>
+    ? contratosmock.filter(c =>
         c.id.toLowerCase().includes(busca.toLowerCase()) ||
         c.tomador.toLowerCase().includes(busca.toLowerCase()) ||
         c.cpfCnpj.includes(busca)
