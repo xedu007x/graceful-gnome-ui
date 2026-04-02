@@ -9,6 +9,8 @@ import ConsultaContratos from "./pages/ConsultaContratos.tsx";
 import VisualizacaoContrato from "./pages/VisualizacaoContrato.tsx";
 import ConsultaOficios from "./pages/ConsultaOficios.tsx";
 import VisualizacaoParcela from "./pages/VisualizacaoParcela.tsx";
+import FundoInvestimentos from "./pages/FundoInvestimentos.tsx";
+import CotasDiarias from "./pages/CotasDiarias.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/oficios" element={<ConsultaOficios />} />
           <Route path="/oficio/:oficioId/parcela/:parcelaId" element={<VisualizacaoParcela />} />
           <Route path="/cnab-recebimentos" element={<CnabRecebimentos />} />
+          <Route path="/fundo-investimentos" element={<FundoInvestimentos />} />
+          <Route path="/fundo-investimento/:fundoId/cotas" element={<CotasDiarias />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
