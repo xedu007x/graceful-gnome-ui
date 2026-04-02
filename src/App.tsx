@@ -11,6 +11,9 @@ import ConsultaOficios from "./pages/ConsultaOficios.tsx";
 import VisualizacaoParcela from "./pages/VisualizacaoParcela.tsx";
 import FundoInvestimentos from "./pages/FundoInvestimentos.tsx";
 import CotasDiarias from "./pages/CotasDiarias.tsx";
+import EmissaoTEC from "./pages/EmissaoTEC.tsx";
+import GerenciarTEC from "./pages/GerenciarTEC.tsx";
+import AcompanhamentoTEC from "./pages/AcompanhamentoTEC.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,10 @@ const App = () => (
           <Route path="/cnab-recebimentos" element={<CnabRecebimentos />} />
           <Route path="/fundo-investimentos" element={<FundoInvestimentos />} />
           <Route path="/fundo-investimento/:fundoId/cotas" element={<CotasDiarias />} />
+          <Route path="/emissao-tec" element={<EmissaoTEC />} />
+          <Route path="/emissao-tec/:tecId" element={<EmissaoTEC />} />
+          <Route path="/gerenciar-tec/:tecId" element={<GerenciarTEC />} />
+          <Route path="/acompanhamento-tec" element={<AcompanhamentoTEC />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

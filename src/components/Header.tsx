@@ -66,8 +66,8 @@ const Header = () => {
                 <DropdownMenuItem>Contas BB</DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
+            <DropdownMenuItem onClick={() => navigate("/acompanhamento-tec")}>Emitir Termos (TEC)</DropdownMenuItem>
             <DropdownMenuItem>Aprovar em Lote</DropdownMenuItem>
-            <DropdownMenuItem>Emitir termos</DropdownMenuItem>
             <DropdownMenuItem>Relatório de Inadimplência</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
