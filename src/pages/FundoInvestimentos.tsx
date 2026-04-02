@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Home, Search, Calendar } from "lucide-react";
 
 const dados = [
-  { id: 1, nome: "BB RENDA FIXA", operador: "Victor Alburquerque Dornelas", vigencia: "01/04/2026 até 12/02/2030", ativo: true },
+  { id: 1, nome: "BB RENDA FIXA", operador: "Eduardo Dias Cordiero", vigencia: "01/04/2026 até 12/02/2030", ativo: true },
   { id: 2, nome: "BB AGÊNCIA", operador: "Sergio Ovalle Marcelo", vigencia: "27/08/2024", ativo: true },
 ];
 
