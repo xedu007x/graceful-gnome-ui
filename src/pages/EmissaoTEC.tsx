@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, Save, Send, FileText, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getCotaMaisRecente, getCotaPorData, getCotas } from "@/lib/cotasStore";
 
 const contratosmock = [
   { id: "CT-2024-001", tomador: "Empresa ABC Ltda", cpfCnpj: "12.345.678/0001-90", valorDevedor: 150000, status: "Inadimplente" },
@@ -49,10 +50,27 @@ const EmissaoTEC = () => {
       )
     : [];
 
-  const cotaDataBase = 3.456789;
-  const cotaDataAtualizacao = 3.612345;
-  const qtdTotalCotas = valorHistorico ? (parseFloat(valorHistorico) / cotaDataBase) : 0;
-  const valorCorrigido = qtdTotalCotas * cotaDataAtualizacao;
+  // Busca cota pela data base no store de cotas diárias
+  const getCotaValorPorData = (dataISO: string): { valor: number; fonte: string } | null => {
+    if (!dataISO) return null;
+    const [y, m, d] = dataISO.split("-");
+    const dataFormatada = `${d}/${m}/${y}`;
+    const cota = getCotaPorData(dataFormatada);
+    if (cota) return { valor: cota.valor, fonte: "Fundo Investimentos" };
+    // Fallback: cota mais recente
+    const recente = getCotaMaisRecente();
+    if (recente) return { valor: recente.valor, fonte: `Fundo Investimentos (${recente.data})` };
+    return null;
+  };
+
+  const cotaBase = getCotaValorPorData(dataBase);
+  const cotaAtual = getCotaValorPorData(dataAtualizacao);
+  const cotaDataBaseVal = cotaBase?.valor || 0;
+  const cotaDataAtualizacaoVal = cotaAtual?.valor || 0;
+  const fonteCota = cotaBase?.fonte || "Sem dados";
+
+  const qtdTotalCotas = valorHistorico && cotaDataBaseVal ? (parseFloat(valorHistorico) / cotaDataBaseVal) : 0;
+  const valorCorrigido = qtdTotalCotas * cotaDataAtualizacaoVal;
   const qtdCotasMensais = numParcelas ? qtdTotalCotas / parseInt(numParcelas) : 0;
 
   const gerarParcelas = (num: string) => {
@@ -82,16 +100,20 @@ const EmissaoTEC = () => {
   };
 
   const calcularParcela = (idx: number) => {
-    const cotaAtual = 3.654321;
+    const recente = getCotaMaisRecente();
+    if (!recente) {
+      toast({ title: "Erro", description: "Nenhuma cota cadastrada no Fundo de Investimentos.", variant: "destructive" });
+      return;
+    }
     const updated = [...parcelas];
     updated[idx] = {
       ...updated[idx],
-      valorPagar: (updated[idx].qtdCotas * cotaAtual).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
-      dataCotaUtilizada: new Date().toLocaleDateString("pt-BR"),
+      valorPagar: (updated[idx].qtdCotas * recente.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+      dataCotaUtilizada: recente.data,
       calculado: true,
     };
     setParcelas(updated);
-    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${new Date().toLocaleDateString("pt-BR")} (fonte: CVM)` });
+    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: Fundo Investimentos)` });
   };
 
   const updateParcela = (idx: number, field: keyof Parcela, value: string) => {
@@ -119,6 +141,7 @@ const EmissaoTEC = () => {
   };
 
   const bloqueado = status !== "Rascunho";
+  const cotasDisponiveis = getCotas();
 
   return (
     <div className="min-h-screen bg-background">
@@ -186,7 +209,14 @@ const EmissaoTEC = () => {
             </div>
 
             <div className="bg-card border rounded-lg p-4 space-y-4">
-              <h3 className="font-semibold text-sm">Dados do TEC</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-sm">Dados do TEC</h3>
+                {cotasDisponiveis.length > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    {cotasDisponiveis.length} cota(s) disponível(is) no Fundo de Investimentos
+                  </span>
+                )}
+              </div>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <Label className="text-xs">Valor histórico a devolver (R$) <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
@@ -210,7 +240,7 @@ const EmissaoTEC = () => {
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Fonte da cota <span className="text-green-600 text-[10px]">AUTO</span></Label>
-                  <Input value="CVM" disabled className="bg-green-50" />
+                  <Input value={fonteCota} disabled className="bg-green-50" />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Nº de parcelas mensais <span className="text-blue-500 text-[10px]">MANUAL</span></Label>

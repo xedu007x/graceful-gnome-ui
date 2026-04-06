@@ -2,38 +2,57 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Home, Search, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Home, Search, RefreshCw, Plus } from "lucide-react";
 import { toast } from "sonner";
-
-const cotasIniciais = [
-  { id: 1, data: "02/04/2026", valor: "R$ 1,0004207" },
-];
+import { getCotas, addCota, type Cota } from "@/lib/cotasStore";
 
 const CotasDiarias = () => {
   const navigate = useNavigate();
   const { fundoId } = useParams();
-  const [cotas, setCotas] = useState(cotasIniciais);
+  const [cotas, setCotas] = useState<Cota[]>(getCotas);
   const [buscando, setBuscando] = useState(false);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [novaData, setNovaData] = useState("");
+  const [novoValor, setNovoValor] = useState("");
 
   const buscarCotaIntegracao = async () => {
     setBuscando(true);
-    // Simula integração com o fundo
     setTimeout(() => {
       const hoje = new Date().toLocaleDateString("pt-BR");
-      const cotaExistente = cotas.find((c) => c.data === hoje);
-      const novaCota = { id: cotas.length + 1, data: hoje, valor: `R$ ${(1 + Math.random() * 0.001).toFixed(7).replace(".", ",")}` };
-      if (cotaExistente) {
-        setCotas(cotas.map((c) => (c.data === hoje ? { ...c, valor: novaCota.valor } : c)));
-        toast.success("Cota atualizada com sucesso!");
-      } else {
-        setCotas([novaCota, ...cotas]);
-        toast.success("Nova cota importada com sucesso!");
-      }
+      const valor = 1 + Math.random() * 0.001;
+      const updated = addCota(hoje, parseFloat(valor.toFixed(7)));
+      setCotas(updated);
+      toast.success("Cota importada/atualizada com sucesso!");
       setBuscando(false);
     }, 1500);
   };
+
+  const handleSalvarNovaCota = () => {
+    if (!novaData || !novoValor) {
+      toast.error("Preencha data e valor da cota.");
+      return;
+    }
+    const [y, m, d] = novaData.split("-");
+    const dataFormatada = `${d}/${m}/${y}`;
+    const valor = parseFloat(novoValor);
+    if (isNaN(valor) || valor <= 0) {
+      toast.error("Valor inválido.");
+      return;
+    }
+    const updated = addCota(dataFormatada, valor);
+    setCotas(updated);
+    toast.success("Cota salva com sucesso!");
+    setModalAberto(false);
+    setNovaData("");
+    setNovoValor("");
+  };
+
+  const formatarValor = (v: number) => `R$ ${v.toFixed(7).replace(".", ",")}`;
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -64,7 +83,9 @@ const CotasDiarias = () => {
 
         <div className="flex items-center justify-end gap-3 mb-4">
           <Button variant="outline" className="rounded-full px-6 border-brand text-brand" onClick={() => navigate("/fundo-investimentos")}>Voltar</Button>
-          <Button className="bg-brand hover:bg-brand/90 text-brand-foreground rounded-full px-6">Nova Cota</Button>
+          <Button className="bg-brand hover:bg-brand/90 text-brand-foreground rounded-full px-6" onClick={() => setModalAberto(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Nova Cota
+          </Button>
           <Button className="bg-brand hover:bg-brand/90 text-brand-foreground rounded-full px-6" onClick={buscarCotaIntegracao} disabled={buscando}>
             <RefreshCw className={`h-4 w-4 mr-2 ${buscando ? "animate-spin" : ""}`} />
             {buscando ? "Buscando..." : "Buscar Cota via Integração"}
@@ -84,7 +105,7 @@ const CotasDiarias = () => {
               {cotas.map((item) => (
                 <TableRow key={item.id} className="hover:bg-muted/50">
                   <TableCell className="text-brand">{item.data}</TableCell>
-                  <TableCell>{item.valor}</TableCell>
+                  <TableCell>{formatarValor(item.valor)}</TableCell>
                   <TableCell className="text-center">
                     <Button variant="ghost" size="icon"><Search className="h-4 w-4" /></Button>
                   </TableCell>
@@ -100,6 +121,29 @@ const CotasDiarias = () => {
           <span>1 - {cotas.length} de {cotas.length}</span>
         </div>
       </div>
+
+      {/* Modal Nova Cota */}
+      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cadastrar Nova Cota</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <Label>Data <span className="text-destructive">*</span></Label>
+              <Input type="date" value={novaData} onChange={e => setNovaData(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>Cota (R$) <span className="text-destructive">*</span></Label>
+              <Input type="number" step="0.0000001" placeholder="Ex: 1.0004207" value={novoValor} onChange={e => setNovoValor(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
+            <Button className="bg-brand hover:bg-brand/90 text-brand-foreground" onClick={handleSalvarNovaCota}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
