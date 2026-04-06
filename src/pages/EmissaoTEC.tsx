@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Save, Send, FileText } from "lucide-react";
+import { Search, Save, Send, FileText, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const contratosmock = [
@@ -16,17 +16,30 @@ const contratosmock = [
   { id: "CT-2023-042", tomador: "Indústria XYZ S/A", cpfCnpj: "98.765.432/0001-10", valorDevedor: 320000, status: "Inadimplente" },
 ];
 
+interface Parcela {
+  numero: number;
+  qtdCotas: number;
+  vencimento: string;
+  dataPagamento: string;
+  dataComunicacao: string;
+  valorPagar: string;
+  dataCotaUtilizada: string;
+  observacoes: string;
+  calculado: boolean;
+}
+
 const EmissaoTEC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [busca, setBusca] = useState("");
-  const [contratoSelecionado, setContratoSelecionado] = useState<typeof contratosMatch[0] | null>(null);
+  const [contratoSelecionado, setContratoSelecionado] = useState<typeof contratosmock[0] | null>(null);
   const [valorHistorico, setValorHistorico] = useState("");
   const [dataBase, setDataBase] = useState("");
   const [dataAtualizacao, setDataAtualizacao] = useState("");
   const [numParcelas, setNumParcelas] = useState("");
   const [diaVencimento, setDiaVencimento] = useState("");
   const [status, setStatus] = useState("Rascunho");
+  const [parcelas, setParcelas] = useState<Parcela[]>([]);
 
   const contratosMatch = busca.length >= 2
     ? contratosmock.filter(c =>
@@ -36,12 +49,56 @@ const EmissaoTEC = () => {
       )
     : [];
 
-  // Simulated calculations
-  const cotaDataBase = 3.456789; // simulated
-  const cotaDataAtualizacao = 3.612345; // simulated
+  const cotaDataBase = 3.456789;
+  const cotaDataAtualizacao = 3.612345;
   const qtdTotalCotas = valorHistorico ? (parseFloat(valorHistorico) / cotaDataBase) : 0;
   const valorCorrigido = qtdTotalCotas * cotaDataAtualizacao;
   const qtdCotasMensais = numParcelas ? qtdTotalCotas / parseInt(numParcelas) : 0;
+
+  const gerarParcelas = (num: string) => {
+    setNumParcelas(num);
+    const n = parseInt(num);
+    if (!n || n <= 0 || !qtdTotalCotas) { setParcelas([]); return; }
+    const dia = diaVencimento ? parseInt(diaVencimento) : 20;
+    const cotasMensais = qtdTotalCotas / n;
+    const hoje = new Date();
+    setParcelas(
+      Array.from({ length: n }, (_, i) => {
+        const mesVenc = new Date(hoje.getFullYear(), hoje.getMonth() + 1 + i, 1);
+        const diaReal = Math.min(dia, new Date(mesVenc.getFullYear(), mesVenc.getMonth() + 1, 0).getDate());
+        return {
+          numero: i + 1,
+          qtdCotas: cotasMensais,
+          vencimento: `${String(diaReal).padStart(2, "0")}/${String(mesVenc.getMonth() + 1).padStart(2, "0")}/${mesVenc.getFullYear()}`,
+          dataPagamento: "",
+          dataComunicacao: "",
+          valorPagar: "",
+          dataCotaUtilizada: "",
+          observacoes: "",
+          calculado: false,
+        };
+      })
+    );
+  };
+
+  const calcularParcela = (idx: number) => {
+    const cotaAtual = 3.654321;
+    const updated = [...parcelas];
+    updated[idx] = {
+      ...updated[idx],
+      valorPagar: (updated[idx].qtdCotas * cotaAtual).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+      dataCotaUtilizada: new Date().toLocaleDateString("pt-BR"),
+      calculado: true,
+    };
+    setParcelas(updated);
+    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${new Date().toLocaleDateString("pt-BR")} (fonte: CVM)` });
+  };
+
+  const updateParcela = (idx: number, field: keyof Parcela, value: string) => {
+    const updated = [...parcelas];
+    updated[idx] = { ...updated[idx], [field]: value };
+    setParcelas(updated);
+  };
 
   const handleSalvar = () => {
     setStatus("Rascunho");
@@ -120,7 +177,7 @@ const EmissaoTEC = () => {
                 <h3 className="font-semibold text-sm">Contrato Selecionado</h3>
                 {!bloqueado && <Button variant="ghost" size="sm" onClick={() => setContratoSelecionado(null)}>Alterar</Button>}
               </div>
-              <div className="grid grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div><span className="text-muted-foreground">Contrato:</span> <strong>{contratoSelecionado.id}</strong></div>
                 <div><span className="text-muted-foreground">Tomador:</span> <strong>{contratoSelecionado.tomador}</strong></div>
                 <div><span className="text-muted-foreground">CPF/CNPJ:</span> <strong>{contratoSelecionado.cpfCnpj}</strong></div>
@@ -131,7 +188,6 @@ const EmissaoTEC = () => {
             <div className="bg-card border rounded-lg p-4 space-y-4">
               <h3 className="font-semibold text-sm">Dados do TEC</h3>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Campos manuais */}
                 <div className="space-y-1">
                   <Label className="text-xs">Valor histórico a devolver (R$) <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
                   <Input type="number" value={valorHistorico} onChange={e => setValorHistorico(e.target.value)} disabled={bloqueado} placeholder="0,00" />
@@ -158,7 +214,7 @@ const EmissaoTEC = () => {
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Nº de parcelas mensais <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
-                  <Input type="number" value={numParcelas} onChange={e => setNumParcelas(e.target.value)} disabled={bloqueado} placeholder="Ex: 12" />
+                  <Input type="number" value={numParcelas} onChange={e => gerarParcelas(e.target.value)} disabled={bloqueado} placeholder="Ex: 12" />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Qtde de cotas mensais <span className="text-green-600 text-[10px]">AUTO</span></Label>
@@ -166,7 +222,7 @@ const EmissaoTEC = () => {
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Dia de vencimento <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
-                  <Select value={diaVencimento} onValueChange={setDiaVencimento} disabled={bloqueado}>
+                  <Select value={diaVencimento} onValueChange={v => { setDiaVencimento(v); if (numParcelas) gerarParcelas(numParcelas); }} disabled={bloqueado}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
                       {Array.from({ length: 31 }, (_, i) => (
@@ -176,26 +232,81 @@ const EmissaoTEC = () => {
                   </Select>
                 </div>
               </div>
+            </div>
 
-              <div className="flex gap-2 pt-4 border-t">
-                <Button variant="outline" onClick={() => navigate("/acompanhamento-tec")}>Cancelar</Button>
-                <Button onClick={handleSalvar} disabled={bloqueado}><Save className="h-4 w-4 mr-1" /> Salvar Rascunho</Button>
-                <Button onClick={handleSolicitarEmissao} disabled={bloqueado} className="bg-amber-600 hover:bg-amber-700">
-                  <Send className="h-4 w-4 mr-1" /> Solicitar Emissão de TEC
-                </Button>
-                {status === "Aguardando emissão GSUP1" && (
-                  <>
-                    <Button onClick={() => { setStatus("TEC gerado"); toast({ title: "TEC gerado", description: "Documento disponível para download em RTF e PDF." }); }} className="bg-blue-600 hover:bg-blue-700">
-                      <FileText className="h-4 w-4 mr-1" /> Gerar TEC (GSUP1)
-                    </Button>
-                  </>
-                )}
-                {status === "TEC gerado" && (
-                  <Button onClick={() => { setStatus("Ativo"); toast({ title: "TEC Finalizado", description: "Fluxo de pagamentos criado. E-mail enviado ao GSUP2." }); }} className="bg-green-600 hover:bg-green-700">
-                    Finalizar TEC
+            {/* Fluxo de parcelas inline */}
+            {parcelas.length > 0 && (
+              <div className="bg-card border rounded-lg overflow-hidden">
+                <div className="p-4 border-b flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">Fluxo de Parcelas ({parcelas.length})</h3>
+                  <Button size="sm" variant="outline" onClick={() => parcelas.forEach((_, idx) => calcularParcela(idx))} disabled={bloqueado && status !== "Ativo"}>
+                    <Calculator className="h-3 w-3 mr-1" /> Calcular Todas
                   </Button>
-                )}
+                </div>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12 text-center">Nº</TableHead>
+                        <TableHead className="bg-yellow-50">Qtd Cotas</TableHead>
+                        <TableHead className="bg-yellow-50">Vencimento</TableHead>
+                        <TableHead className="bg-blue-50">Data Pgto</TableHead>
+                        <TableHead className="bg-blue-50">Data Comunicação</TableHead>
+                        <TableHead>Valor a Pagar</TableHead>
+                        <TableHead>Data Cota</TableHead>
+                        <TableHead className="bg-blue-50">Observações</TableHead>
+                        <TableHead className="w-24">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {parcelas.map((p, idx) => (
+                        <TableRow key={p.numero}>
+                          <TableCell className="text-center font-medium">{p.numero}</TableCell>
+                          <TableCell className="bg-yellow-50/50">{p.qtdCotas.toFixed(6)}</TableCell>
+                          <TableCell className="bg-yellow-50/50">{p.vencimento}</TableCell>
+                          <TableCell className="bg-blue-50/50">
+                            <Input type="date" value={p.dataPagamento} onChange={e => updateParcela(idx, "dataPagamento", e.target.value)} className="h-8 text-xs" />
+                          </TableCell>
+                          <TableCell className="bg-blue-50/50">
+                            <Input type="date" value={p.dataComunicacao} onChange={e => updateParcela(idx, "dataComunicacao", e.target.value)} className="h-8 text-xs" />
+                          </TableCell>
+                          <TableCell className={p.calculado ? "text-green-700 font-medium" : "text-muted-foreground"}>
+                            {p.valorPagar || "—"}
+                          </TableCell>
+                          <TableCell className="text-xs">{p.dataCotaUtilizada || "—"}</TableCell>
+                          <TableCell className="bg-blue-50/50">
+                            <Input value={p.observacoes} onChange={e => updateParcela(idx, "observacoes", e.target.value)} className="h-8 text-xs" placeholder="..." />
+                          </TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" onClick={() => calcularParcela(idx)} className="h-7 text-xs">
+                              <Calculator className="h-3 w-3 mr-1" /> Calc
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
+            )}
+
+            {/* Ações */}
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => navigate("/acompanhamento-tec")}>Cancelar</Button>
+              <Button onClick={handleSalvar} disabled={bloqueado}><Save className="h-4 w-4 mr-1" /> Salvar Rascunho</Button>
+              <Button onClick={handleSolicitarEmissao} disabled={bloqueado} className="bg-amber-600 hover:bg-amber-700">
+                <Send className="h-4 w-4 mr-1" /> Solicitar Emissão de TEC
+              </Button>
+              {status === "Aguardando emissão GSUP1" && (
+                <Button onClick={() => { setStatus("TEC gerado"); toast({ title: "TEC gerado", description: "Documento disponível para download em RTF e PDF." }); }} className="bg-blue-600 hover:bg-blue-700">
+                  <FileText className="h-4 w-4 mr-1" /> Gerar TEC (GSUP1)
+                </Button>
+              )}
+              {status === "TEC gerado" && (
+                <Button onClick={() => { setStatus("Ativo"); toast({ title: "TEC Finalizado", description: "Fluxo de pagamentos criado. E-mail enviado ao GSUP2." }); }} className="bg-green-600 hover:bg-green-700">
+                  Finalizar TEC
+                </Button>
+              )}
             </div>
           </>
         )}
