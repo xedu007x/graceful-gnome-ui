@@ -212,7 +212,7 @@ const EmissaoTEC = () => {
                 <div><span className="text-muted-foreground">Contrato:</span> <strong>{contratoSelecionado.id}</strong></div>
                 <div><span className="text-muted-foreground">Tomador:</span> <strong>{contratoSelecionado.tomador}</strong></div>
                 <div><span className="text-muted-foreground">CPF/CNPJ:</span> <strong>{contratoSelecionado.cpfCnpj}</strong></div>
-                <div><span className="text-muted-foreground">Status:</span> <Badge variant="destructive">{contratoSelecionado.status}</Badge></div>
+                <div><span className="text-muted-foreground">Valor Devedor:</span> <strong>{contratoSelecionado.valorDevedor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</strong></div>
               </div>
             </div>
 
