@@ -225,41 +225,69 @@ const EmissaoTEC = () => {
                   </span>
                 )}
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <Label className="text-xs">Valor histórico a devolver (R$) <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
+              <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
+                <div className="space-y-1 border rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-orange-100 text-orange-700 border-orange-300">Manual</Badge>
+                    <Label className="text-xs font-semibold">Valor histórico a devolver</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">R$ informado pelo analista</p>
                   <Input type="number" value={valorHistorico} onChange={e => setValorHistorico(e.target.value)} disabled={bloqueado} placeholder="0,00" />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Data base <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
+                <div className="space-y-1 border rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-orange-100 text-orange-700 border-orange-300">Manual</Badge>
+                    <Label className="text-xs font-semibold">Data base</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Data de referência do valor histórico</p>
                   <Input type="date" value={dataBase} onChange={e => setDataBase(e.target.value)} disabled={bloqueado} />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Qtde total de cotas <span className="text-green-600 text-[10px]">AUTO</span></Label>
+                <div className="space-y-1 border rounded-lg p-3 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-green-100 text-green-700 border-green-300">Automático</Badge>
+                    <Label className="text-xs font-semibold">Quantidade total de cotas</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Valor histórico ÷ cota na data base (CVM ou planilha)</p>
                   <Input value={qtdTotalCotas ? qtdTotalCotas.toFixed(6) : ""} disabled className="bg-green-50" />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Data da atualização <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
+                <div className="space-y-1 border rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-orange-100 text-orange-700 border-orange-300">Manual</Badge>
+                    <Label className="text-xs font-semibold">Data da atualização</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Data para correção do valor</p>
                   <Input type="date" value={dataAtualizacao} onChange={e => setDataAtualizacao(e.target.value)} disabled={bloqueado} />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Valor corrigido a devolver <span className="text-green-600 text-[10px]">AUTO</span></Label>
+                <div className="space-y-1 border rounded-lg p-3 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-green-100 text-green-700 border-green-300">Automático</Badge>
+                    <Label className="text-xs font-semibold">Valor corrigido a devolver</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Qtde de cotas × valor da cota na data de atualização</p>
                   <Input value={valorCorrigido ? valorCorrigido.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : ""} disabled className="bg-green-50" />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Fonte da cota <span className="text-green-600 text-[10px]">AUTO</span></Label>
-                  <Input value={fonteCota} disabled className="bg-green-50" />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Nº de parcelas mensais <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
+                <div className="space-y-1 border rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-orange-100 text-orange-700 border-orange-300">Manual</Badge>
+                    <Label className="text-xs font-semibold">Nº de parcelas mensais</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Negociado com o tomador</p>
                   <Input type="number" value={numParcelas} onChange={e => gerarParcelas(e.target.value)} disabled={bloqueado} placeholder="Ex: 12" />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Qtde de cotas mensais <span className="text-green-600 text-[10px]">AUTO</span></Label>
+                <div className="space-y-1 border rounded-lg p-3 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-green-100 text-green-700 border-green-300">Automático</Badge>
+                    <Label className="text-xs font-semibold">Qtde de cotas mensais</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Qtde total de cotas ÷ nº de parcelas</p>
                   <Input value={qtdCotasMensais ? qtdCotasMensais.toFixed(6) : ""} disabled className="bg-green-50" />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Dia de vencimento <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
+                <div className="space-y-1 border rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-orange-100 text-orange-700 border-orange-300">Manual</Badge>
+                    <Label className="text-xs font-semibold">Vencimento das parcelas</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Dia (1 a 31) definido na negociação</p>
                   <Select value={diaVencimento} onValueChange={v => { setDiaVencimento(v); if (numParcelas) gerarParcelas(numParcelas); }} disabled={bloqueado}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
@@ -268,6 +296,14 @@ const EmissaoTEC = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-1 border rounded-lg p-3 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] bg-green-100 text-green-700 border-green-300">Automático</Badge>
+                    <Label className="text-xs font-semibold">Fonte da cota</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Origem do valor utilizado no cálculo</p>
+                  <Input value={fonteCota} disabled className="bg-green-50" />
                 </div>
               </div>
             </div>
