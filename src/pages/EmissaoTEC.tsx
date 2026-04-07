@@ -75,8 +75,15 @@ const EmissaoTEC = () => {
 
   const gerarParcelas = (num: string) => {
     setNumParcelas(num);
-    const n = parseInt(num);
-    if (!n || n <= 0 || !qtdTotalCotas) { setParcelas([]); return; }
+    // Parcelas só são geradas ao clicar em "Gerar TEC"
+  };
+
+  const gerarGridParcelas = () => {
+    const n = parseInt(numParcelas);
+    if (!n || n <= 0 || !qtdTotalCotas) {
+      toast({ title: "Erro", description: "Preencha o valor histórico, data base e número de parcelas antes de gerar.", variant: "destructive" });
+      return;
+    }
     const dia = diaVencimento ? parseInt(diaVencimento) : 20;
     const cotasMensais = qtdTotalCotas / n;
     const hoje = new Date();
@@ -97,6 +104,7 @@ const EmissaoTEC = () => {
         };
       })
     );
+    toast({ title: "Parcelas geradas", description: `${n} parcelas criadas com sucesso.` });
   };
 
   const calcularParcela = (idx: number) => {
