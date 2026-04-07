@@ -121,7 +121,7 @@ const EmissaoTEC = () => {
       calculado: true,
     };
     setParcelas(updated);
-    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: Fundo Investimentos)` });
+    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: BB RF CP Automático)` });
   };
 
   const updateParcela = (idx: number, field: keyof Parcela, value: string) => {
