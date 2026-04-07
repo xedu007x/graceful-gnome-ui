@@ -71,18 +71,6 @@ const AcompanhamentoTEC = () => {
           </div>
         </div>
 
-        {/* Resumo por status */}
-        <div className="flex gap-3">
-          {Object.entries(statusColors).map(([status, cls]) => {
-            const count = tecsData.filter(t => t.status === status).length;
-            return (
-              <button key={status} onClick={() => setFiltroStatus(status === filtroStatus ? "todos" : status)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${filtroStatus === status ? "ring-2 ring-offset-1 ring-primary" : ""} ${cls}`}>
-                {status} ({count})
-              </button>
-            );
-          })}
-        </div>
 
         {/* Grid */}
         <div className="bg-card border rounded-lg overflow-hidden">

@@ -56,10 +56,10 @@ const EmissaoTEC = () => {
     const [y, m, d] = dataISO.split("-");
     const dataFormatada = `${d}/${m}/${y}`;
     const cota = getCotaPorData(dataFormatada);
-    if (cota) return { valor: cota.valor, fonte: "Fundo Investimentos" };
+    if (cota) return { valor: cota.valor, fonte: "BB RF CP Automático - CNPJ: 42.592.315/0001-15" };
     // Fallback: cota mais recente
     const recente = getCotaMaisRecente();
-    if (recente) return { valor: recente.valor, fonte: `Fundo Investimentos (${recente.data})` };
+    if (recente) return { valor: recente.valor, fonte: `BB RF CP Automático (${recente.data})` };
     return null;
   };
 
@@ -75,8 +75,15 @@ const EmissaoTEC = () => {
 
   const gerarParcelas = (num: string) => {
     setNumParcelas(num);
-    const n = parseInt(num);
-    if (!n || n <= 0 || !qtdTotalCotas) { setParcelas([]); return; }
+    // Parcelas só são geradas ao clicar em "Gerar TEC"
+  };
+
+  const gerarGridParcelas = () => {
+    const n = parseInt(numParcelas);
+    if (!n || n <= 0 || !qtdTotalCotas) {
+      toast({ title: "Erro", description: "Preencha o valor histórico, data base e número de parcelas antes de gerar.", variant: "destructive" });
+      return;
+    }
     const dia = diaVencimento ? parseInt(diaVencimento) : 20;
     const cotasMensais = qtdTotalCotas / n;
     const hoje = new Date();
@@ -97,6 +104,7 @@ const EmissaoTEC = () => {
         };
       })
     );
+    toast({ title: "Parcelas geradas", description: `${n} parcelas criadas com sucesso.` });
   };
 
   const calcularParcela = (idx: number) => {
@@ -113,7 +121,7 @@ const EmissaoTEC = () => {
       calculado: true,
     };
     setParcelas(updated);
-    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: Fundo Investimentos)` });
+    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: BB RF CP Automático)` });
   };
 
   const updateParcela = (idx: number, field: keyof Parcela, value: string) => {
@@ -328,7 +336,7 @@ const EmissaoTEC = () => {
                 <Send className="h-4 w-4 mr-1" /> Solicitar Emissão de TEC
               </Button>
               {status === "Aguardando emissão GSUP1" && (
-                <Button onClick={() => { setStatus("TEC gerado"); toast({ title: "TEC gerado", description: "Documento disponível para download em RTF e PDF." }); }} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => { gerarGridParcelas(); setStatus("TEC gerado"); toast({ title: "TEC gerado", description: "Parcelas geradas e documento disponível para download em RTF e PDF." }); }} className="bg-blue-600 hover:bg-blue-700">
                   <FileText className="h-4 w-4 mr-1" /> Gerar TEC (GSUP1)
                 </Button>
               )}
