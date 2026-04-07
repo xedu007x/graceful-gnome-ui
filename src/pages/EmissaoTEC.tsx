@@ -39,7 +39,7 @@ const EmissaoTEC = () => {
   const [dataAtualizacao, setDataAtualizacao] = useState("");
   const [numParcelas, setNumParcelas] = useState("");
   const [diaVencimento, setDiaVencimento] = useState("");
-  const [status, setStatus] = useState("Rascunho");
+  const [status, setStatus] = useState("Em negociação");
   const [parcelas, setParcelas] = useState<Parcela[]>([]);
 
   const contratosMatch = busca.length >= 2
@@ -121,6 +121,10 @@ const EmissaoTEC = () => {
       calculado: true,
     };
     setParcelas(updated);
+    // Primeira parcela calculada → status "Em andamento"
+    if (status === "TEC emitido" && !parcelas.some(p => p.calculado)) {
+      setStatus("Em andamento");
+    }
     toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: BB RF CP Automático)` });
   };
 
@@ -131,24 +135,25 @@ const EmissaoTEC = () => {
   };
 
   const handleSalvar = () => {
-    setStatus("Rascunho");
-    toast({ title: "TEC salvo como rascunho", description: "Você pode editar e solicitar emissão posteriormente." });
+    setStatus("Em negociação");
+    toast({ title: "TEC salvo", description: "Status: Em negociação. Você pode editar e solicitar emissão." });
   };
 
   const handleSolicitarEmissao = () => {
-    setStatus("Aguardando emissão GSUP1");
-    toast({ title: "Emissão solicitada", description: "E-mail enviado ao GSUP1. Campos bloqueados até análise." });
+    setStatus("Em formalização");
+    toast({ title: "Emissão solicitada", description: "Status: Em formalização. Aguardando GESUP1." });
   };
 
-  const statusColor: Record<string, string> = {
-    "Rascunho": "bg-gray-100 text-gray-700",
-    "Aguardando emissão GSUP1": "bg-yellow-100 text-yellow-800",
-    "TEC gerado": "bg-blue-100 text-blue-800",
-    "Ativo": "bg-green-100 text-green-800",
-    "Encerrado": "bg-red-100 text-red-700",
+  const statusConfig: Record<string, { color: string; icon: string }> = {
+    "Em negociação": { color: "bg-gray-200 text-gray-800 border-gray-300", icon: "📝" },
+    "Em formalização": { color: "bg-amber-100 text-amber-800 border-amber-300", icon: "📋" },
+    "TEC emitido": { color: "bg-blue-100 text-blue-800 border-blue-300", icon: "📄" },
+    "Em andamento": { color: "bg-emerald-100 text-emerald-800 border-emerald-300", icon: "▶️" },
+    "Em atraso": { color: "bg-red-100 text-red-800 border-red-300", icon: "⚠️" },
+    "Encerrado": { color: "bg-slate-200 text-slate-700 border-slate-400", icon: "✅" },
   };
 
-  const bloqueado = status !== "Rascunho";
+  const bloqueado = status !== "Em negociação";
   const cotasDisponiveis = getCotas();
 
   return (
@@ -160,7 +165,9 @@ const EmissaoTEC = () => {
             <h2 className="text-xl font-bold text-foreground">Emissão de TEC</h2>
             <p className="text-sm text-muted-foreground">Termo de Encerramento Condicionado</p>
           </div>
-          <Badge className={statusColor[status] || ""}>{status}</Badge>
+          <Badge className={`text-sm px-4 py-1.5 border font-semibold ${statusConfig[status]?.color || "bg-gray-100 text-gray-700"}`}>
+            {statusConfig[status]?.icon} {status}
+          </Badge>
         </div>
 
         {/* Busca de contrato */}
@@ -332,16 +339,24 @@ const EmissaoTEC = () => {
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={() => navigate("/acompanhamento-tec")}>Cancelar</Button>
               <Button onClick={handleSalvar} disabled={bloqueado}><Save className="h-4 w-4 mr-1" /> Salvar Rascunho</Button>
-              <Button onClick={handleSolicitarEmissao} disabled={bloqueado} className="bg-amber-600 hover:bg-amber-700">
+              <Button onClick={handleSolicitarEmissao} disabled={bloqueado} className="bg-amber-600 hover:bg-amber-700 text-white">
                 <Send className="h-4 w-4 mr-1" /> Solicitar Emissão de TEC
               </Button>
-              {status === "Aguardando emissão GSUP1" && (
-                <Button onClick={() => { gerarGridParcelas(); setStatus("TEC gerado"); toast({ title: "TEC gerado", description: "Parcelas geradas e documento disponível para download em RTF e PDF." }); }} className="bg-blue-600 hover:bg-blue-700">
+              {status === "Em formalização" && (
+                <Button onClick={() => { gerarGridParcelas(); setStatus("TEC emitido"); toast({ title: "TEC gerado", description: "Parcelas geradas. Status: TEC emitido." }); }} className="bg-blue-600 hover:bg-blue-700 text-white">
                   <FileText className="h-4 w-4 mr-1" /> Gerar TEC (GSUP1)
                 </Button>
               )}
-              {status === "TEC gerado" && (
-                <Button onClick={() => { setStatus("Ativo"); toast({ title: "TEC Finalizado", description: "Fluxo de pagamentos criado. E-mail enviado ao GSUP2." }); }} className="bg-green-600 hover:bg-green-700">
+              {(status === "TEC emitido" || status === "Em andamento") && (
+                <Button onClick={() => { 
+                  const todasCalculadas = parcelas.every(p => p.calculado);
+                  if (todasCalculadas) {
+                    setStatus("Encerrado"); 
+                    toast({ title: "TEC Encerrado", description: "Todas as parcelas pagas. Status: Encerrado." });
+                  } else {
+                    toast({ title: "Atenção", description: "Calcule todas as parcelas antes de finalizar.", variant: "destructive" });
+                  }
+                }} className="bg-green-600 hover:bg-green-700 text-white">
                   Finalizar TEC
                 </Button>
               )}
