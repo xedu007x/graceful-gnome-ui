@@ -56,10 +56,10 @@ const EmissaoTEC = () => {
     const [y, m, d] = dataISO.split("-");
     const dataFormatada = `${d}/${m}/${y}`;
     const cota = getCotaPorData(dataFormatada);
-    if (cota) return { valor: cota.valor, fonte: "Fundo Investimentos" };
+    if (cota) return { valor: cota.valor, fonte: "BB RF CP Automático - CNPJ: 42.592.315/0001-15" };
     // Fallback: cota mais recente
     const recente = getCotaMaisRecente();
-    if (recente) return { valor: recente.valor, fonte: `Fundo Investimentos (${recente.data})` };
+    if (recente) return { valor: recente.valor, fonte: `BB RF CP Automático (${recente.data})` };
     return null;
   };
 
@@ -336,7 +336,7 @@ const EmissaoTEC = () => {
                 <Send className="h-4 w-4 mr-1" /> Solicitar Emissão de TEC
               </Button>
               {status === "Aguardando emissão GSUP1" && (
-                <Button onClick={() => { setStatus("TEC gerado"); toast({ title: "TEC gerado", description: "Documento disponível para download em RTF e PDF." }); }} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => { gerarGridParcelas(); setStatus("TEC gerado"); toast({ title: "TEC gerado", description: "Parcelas geradas e documento disponível para download em RTF e PDF." }); }} className="bg-blue-600 hover:bg-blue-700">
                   <FileText className="h-4 w-4 mr-1" /> Gerar TEC (GSUP1)
                 </Button>
               )}
