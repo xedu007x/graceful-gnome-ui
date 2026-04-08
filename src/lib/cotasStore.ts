@@ -7,8 +7,9 @@ export interface Cota {
 const STORAGE_KEY = "gfesp_cotas_diarias";
 
 const cotasIniciais: Cota[] = [
-  { id: 1, data: "02/04/2026", valor: 1.0004207 },
-  { id: 2, data: "01/04/2026", valor: 1.0003150 },
+  { id: 1, data: "08/04/2025", valor: 2.9351388 },
+  { id: 2, data: "02/04/2026", valor: 1.0004207 },
+  { id: 3, data: "01/04/2026", valor: 1.0003150 },
 ];
 
 export function getCotas(): Cota[] {
