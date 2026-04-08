@@ -5,19 +5,23 @@ export interface Cota {
 }
 
 const STORAGE_KEY = "gfesp_cotas_diarias";
+const STORAGE_VERSION_KEY = "gfesp_cotas_version";
+const CURRENT_VERSION = "2";
 
 const cotasIniciais: Cota[] = [
   { id: 1, data: "08/04/2025", valor: 2.9351388 },
-  { id: 2, data: "02/04/2026", valor: 1.0004207 },
-  { id: 3, data: "01/04/2026", valor: 1.0003150 },
 ];
 
 export function getCotas(): Cota[] {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) {
-    try { return JSON.parse(stored); } catch { /* fall through */ }
+  const version = localStorage.getItem(STORAGE_VERSION_KEY);
+  if (version === CURRENT_VERSION) {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try { return JSON.parse(stored); } catch { /* fall through */ }
+    }
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(cotasIniciais));
+  localStorage.setItem(STORAGE_VERSION_KEY, CURRENT_VERSION);
   return cotasIniciais;
 }
 
