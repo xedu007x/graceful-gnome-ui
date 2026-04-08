@@ -69,7 +69,8 @@ const EmissaoTEC = () => {
   const cotaDataAtualizacaoVal = cotaAtual?.valor || 0;
   const fonteCota = cotaBase?.fonte || "Sem dados";
 
-  const qtdTotalCotas = valorHistorico && cotaDataBaseVal ? (parseFloat(valorHistorico) / cotaDataBaseVal) : 0;
+  const valorHistoricoNum = valorHistorico ? parseFloat(valorHistorico.replace(/\./g, "").replace(",", ".")) : 0;
+  const qtdTotalCotas = valorHistoricoNum && cotaDataBaseVal ? (valorHistoricoNum / cotaDataBaseVal) : 0;
   const valorCorrigido = qtdTotalCotas * cotaDataAtualizacaoVal;
   const qtdCotasMensais = numParcelas ? qtdTotalCotas / parseInt(numParcelas) : 0;
 
