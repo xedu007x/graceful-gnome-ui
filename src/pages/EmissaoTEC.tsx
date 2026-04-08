@@ -98,11 +98,13 @@ const EmissaoTEC = () => {
           numero: i + 1,
           qtdCotas: cotasMensais,
           vencimento: `${String(diaReal).padStart(2, "0")}/${String(mesVenc.getMonth() + 1).padStart(2, "0")}/${mesVenc.getFullYear()}`,
-          dataPagamento: "",
-          dataComunicacao: "",
-          valorPagar: "",
-          dataCotaUtilizada: "",
-          observacoes: "",
+          cotacao: 0,
+          dataCotacao: "",
+          valorRS: 0,
+          preenchimentoSigam: "",
+          dataPgto: "",
+          valorPago: 0,
+          comunicadoSigam: "",
           calculado: false,
         };
       })
