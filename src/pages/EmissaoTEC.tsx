@@ -303,7 +303,12 @@ const EmissaoTEC = () => {
             {parcelas.length > 0 && (
               <div className="bg-card border rounded-lg overflow-hidden">
                 <div className="p-4 border-b flex items-center justify-between">
-                  <h3 className="font-semibold text-sm">Fluxo de Parcelas ({parcelas.length})</h3>
+                  <div>
+                    <h3 className="font-semibold text-sm">Fluxo de Parcelas ({parcelas.length})</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Devolução mensal em cotas: <strong>{qtdCotasMensais.toFixed(2)}</strong> | Qtd total cotas: <strong>{qtdTotalCotas.toFixed(2)}</strong>
+                    </p>
+                  </div>
                   <Button size="sm" variant="outline" onClick={() => parcelas.forEach((_, idx) => calcularParcela(idx))} disabled={bloqueado && status !== "Ativo"}>
                     <Calculator className="h-3 w-3 mr-1" /> Calcular Todas
                   </Button>
