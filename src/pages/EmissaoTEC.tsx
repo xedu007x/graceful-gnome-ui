@@ -21,11 +21,13 @@ interface Parcela {
   numero: number;
   qtdCotas: number;
   vencimento: string;
-  dataPagamento: string;
-  dataComunicacao: string;
-  valorPagar: string;
-  dataCotaUtilizada: string;
-  observacoes: string;
+  cotacao: number;
+  dataCotacao: string;
+  valorRS: number;
+  preenchimentoSigam: string;
+  dataPgto: string;
+  valorPago: number;
+  comunicadoSigam: string;
   calculado: boolean;
 }
 
@@ -96,11 +98,13 @@ const EmissaoTEC = () => {
           numero: i + 1,
           qtdCotas: cotasMensais,
           vencimento: `${String(diaReal).padStart(2, "0")}/${String(mesVenc.getMonth() + 1).padStart(2, "0")}/${mesVenc.getFullYear()}`,
-          dataPagamento: "",
-          dataComunicacao: "",
-          valorPagar: "",
-          dataCotaUtilizada: "",
-          observacoes: "",
+          cotacao: 0,
+          dataCotacao: "",
+          valorRS: 0,
+          preenchimentoSigam: "",
+          dataPgto: "",
+          valorPago: 0,
+          comunicadoSigam: "",
           calculado: false,
         };
       })
@@ -115,18 +119,19 @@ const EmissaoTEC = () => {
       return;
     }
     const updated = [...parcelas];
+    const valorCalc = updated[idx].qtdCotas * recente.valor;
     updated[idx] = {
       ...updated[idx],
-      valorPagar: (updated[idx].qtdCotas * recente.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
-      dataCotaUtilizada: recente.data,
+      cotacao: recente.valor,
+      dataCotacao: recente.data,
+      valorRS: valorCalc,
       calculado: true,
     };
     setParcelas(updated);
-    // Primeira parcela calculada → status "Em andamento"
     if (status === "TEC emitido" && !parcelas.some(p => p.calculado)) {
       setStatus("Em andamento");
     }
-    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: BB RF CP Automático)` });
+    toast({ title: "Parcela calculada", description: `Valor: ${valorCalc.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} (cota: ${recente.valor} de ${recente.data})` });
   };
 
   const updateParcela = (idx: number, field: keyof Parcela, value: string) => {
@@ -298,7 +303,12 @@ const EmissaoTEC = () => {
             {parcelas.length > 0 && (
               <div className="bg-card border rounded-lg overflow-hidden">
                 <div className="p-4 border-b flex items-center justify-between">
-                  <h3 className="font-semibold text-sm">Fluxo de Parcelas ({parcelas.length})</h3>
+                  <div>
+                    <h3 className="font-semibold text-sm">Fluxo de Parcelas ({parcelas.length})</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Devolução mensal em cotas: <strong>{qtdCotasMensais.toFixed(2)}</strong> | Qtd total cotas: <strong>{qtdTotalCotas.toFixed(2)}</strong>
+                    </p>
+                  </div>
                   <Button size="sm" variant="outline" onClick={() => parcelas.forEach((_, idx) => calcularParcela(idx))} disabled={bloqueado && status !== "Ativo"}>
                     <Calculator className="h-3 w-3 mr-1" /> Calcular Todas
                   </Button>
@@ -307,14 +317,15 @@ const EmissaoTEC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-12 text-center">Nº</TableHead>
-                        <TableHead className="bg-yellow-50">Qtd Cotas</TableHead>
-                        <TableHead className="bg-yellow-50">Vencimento</TableHead>
-                        <TableHead className="bg-blue-50">Data Pgto</TableHead>
-                        <TableHead className="bg-blue-50">Data Comunicação</TableHead>
-                        <TableHead>Valor a Pagar</TableHead>
-                        <TableHead>Data Cota</TableHead>
-                        <TableHead className="bg-blue-50">Observações</TableHead>
+                        <TableHead className="w-12 text-center">Parcela</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Cotação</TableHead>
+                        <TableHead>Data da cotação</TableHead>
+                        <TableHead>Valor R$</TableHead>
+                        <TableHead>Preenchimento Sigam</TableHead>
+                        <TableHead>Data Pgto</TableHead>
+                        <TableHead>Valor Pago</TableHead>
+                        <TableHead>Comunicado SIGAM</TableHead>
                         <TableHead className="w-24">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -322,20 +333,25 @@ const EmissaoTEC = () => {
                       {parcelas.map((p, idx) => (
                         <TableRow key={p.numero}>
                           <TableCell className="text-center font-medium">{p.numero}</TableCell>
-                          <TableCell className="bg-yellow-50/50">{p.qtdCotas.toFixed(6)}</TableCell>
-                          <TableCell className="bg-yellow-50/50">{p.vencimento}</TableCell>
-                          <TableCell className="bg-blue-50/50">
-                            <Input type="date" value={p.dataPagamento} onChange={e => updateParcela(idx, "dataPagamento", e.target.value)} className="h-8 text-xs" />
+                          <TableCell>{p.vencimento}</TableCell>
+                          <TableCell className={p.calculado ? "font-medium" : "text-muted-foreground"}>
+                            {p.cotacao ? p.cotacao.toFixed(8) : "—"}
                           </TableCell>
-                          <TableCell className="bg-blue-50/50">
-                            <Input type="date" value={p.dataComunicacao} onChange={e => updateParcela(idx, "dataComunicacao", e.target.value)} className="h-8 text-xs" />
+                          <TableCell className="text-xs">{p.dataCotacao || "—"}</TableCell>
+                          <TableCell className={p.calculado ? "font-medium" : "text-muted-foreground"}>
+                            {p.valorRS ? p.valorRS.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "0"}
                           </TableCell>
-                          <TableCell className={p.calculado ? "text-green-700 font-medium" : "text-muted-foreground"}>
-                            {p.valorPagar || "—"}
+                          <TableCell>
+                            <Input type="date" value={p.preenchimentoSigam} onChange={e => updateParcela(idx, "preenchimentoSigam", e.target.value)} className="h-8 text-xs" />
                           </TableCell>
-                          <TableCell className="text-xs">{p.dataCotaUtilizada || "—"}</TableCell>
-                          <TableCell className="bg-blue-50/50">
-                            <Input value={p.observacoes} onChange={e => updateParcela(idx, "observacoes", e.target.value)} className="h-8 text-xs" placeholder="..." />
+                          <TableCell>
+                            <Input type="date" value={p.dataPgto} onChange={e => updateParcela(idx, "dataPgto", e.target.value)} className="h-8 text-xs" />
+                          </TableCell>
+                          <TableCell className={p.valorPago ? "font-medium" : "text-muted-foreground"}>
+                            {p.valorPago ? p.valorPago.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Input type="date" value={p.comunicadoSigam} onChange={e => updateParcela(idx, "comunicadoSigam", e.target.value)} className="h-8 text-xs" />
                           </TableCell>
                           <TableCell>
                             <Button size="sm" variant="outline" onClick={() => calcularParcela(idx)} className="h-7 text-xs">
