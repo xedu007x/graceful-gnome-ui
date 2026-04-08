@@ -176,6 +176,20 @@ const EmissaoTEC = () => {
           </Badge>
         </div>
 
+        {/* Botões de download - visíveis após TEC emitido */}
+        {["TEC emitido", "Em andamento", "Em atraso", "Encerrado"].includes(status) && (
+          <div className="flex gap-3">
+            <Button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-6">
+              <Download className="h-4 w-4 mr-2" />
+              Baixar Termo em PDF
+            </Button>
+            <Button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-6">
+              <Download className="h-4 w-4 mr-2" />
+              Baixar Termo em Word
+            </Button>
+          </div>
+        )}
+
         {/* Busca de contrato */}
         {!contratoSelecionado && (
           <div className="bg-card border rounded-lg p-4 space-y-4">
