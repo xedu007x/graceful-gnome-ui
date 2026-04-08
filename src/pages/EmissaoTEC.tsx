@@ -312,14 +312,15 @@ const EmissaoTEC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-12 text-center">Nº</TableHead>
-                        <TableHead className="bg-yellow-50">Qtd Cotas</TableHead>
-                        <TableHead className="bg-yellow-50">Vencimento</TableHead>
-                        <TableHead className="bg-blue-50">Data Pgto</TableHead>
-                        <TableHead className="bg-blue-50">Data Comunicação</TableHead>
-                        <TableHead>Valor a Pagar</TableHead>
-                        <TableHead>Data Cota</TableHead>
-                        <TableHead className="bg-blue-50">Observações</TableHead>
+                        <TableHead className="w-12 text-center">Parcela</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Cotação</TableHead>
+                        <TableHead>Data da cotação</TableHead>
+                        <TableHead>Valor R$</TableHead>
+                        <TableHead>Preenchimento Sigam</TableHead>
+                        <TableHead>Data Pgto</TableHead>
+                        <TableHead>Valor Pago</TableHead>
+                        <TableHead>Comunicado SIGAM</TableHead>
                         <TableHead className="w-24">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -327,20 +328,25 @@ const EmissaoTEC = () => {
                       {parcelas.map((p, idx) => (
                         <TableRow key={p.numero}>
                           <TableCell className="text-center font-medium">{p.numero}</TableCell>
-                          <TableCell className="bg-yellow-50/50">{p.qtdCotas.toFixed(6)}</TableCell>
-                          <TableCell className="bg-yellow-50/50">{p.vencimento}</TableCell>
-                          <TableCell className="bg-blue-50/50">
-                            <Input type="date" value={p.dataPagamento} onChange={e => updateParcela(idx, "dataPagamento", e.target.value)} className="h-8 text-xs" />
+                          <TableCell>{p.vencimento}</TableCell>
+                          <TableCell className={p.calculado ? "font-medium" : "text-muted-foreground"}>
+                            {p.cotacao ? p.cotacao.toFixed(8) : "—"}
                           </TableCell>
-                          <TableCell className="bg-blue-50/50">
-                            <Input type="date" value={p.dataComunicacao} onChange={e => updateParcela(idx, "dataComunicacao", e.target.value)} className="h-8 text-xs" />
+                          <TableCell className="text-xs">{p.dataCotacao || "—"}</TableCell>
+                          <TableCell className={p.calculado ? "font-medium" : "text-muted-foreground"}>
+                            {p.valorRS ? p.valorRS.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "0"}
                           </TableCell>
-                          <TableCell className={p.calculado ? "text-green-700 font-medium" : "text-muted-foreground"}>
-                            {p.valorPagar || "—"}
+                          <TableCell>
+                            <Input type="date" value={p.preenchimentoSigam} onChange={e => updateParcela(idx, "preenchimentoSigam", e.target.value)} className="h-8 text-xs" />
                           </TableCell>
-                          <TableCell className="text-xs">{p.dataCotaUtilizada || "—"}</TableCell>
-                          <TableCell className="bg-blue-50/50">
-                            <Input value={p.observacoes} onChange={e => updateParcela(idx, "observacoes", e.target.value)} className="h-8 text-xs" placeholder="..." />
+                          <TableCell>
+                            <Input type="date" value={p.dataPgto} onChange={e => updateParcela(idx, "dataPgto", e.target.value)} className="h-8 text-xs" />
+                          </TableCell>
+                          <TableCell className={p.valorPago ? "font-medium" : "text-muted-foreground"}>
+                            {p.valorPago ? p.valorPago.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Input type="date" value={p.comunicadoSigam} onChange={e => updateParcela(idx, "comunicadoSigam", e.target.value)} className="h-8 text-xs" />
                           </TableCell>
                           <TableCell>
                             <Button size="sm" variant="outline" onClick={() => calcularParcela(idx)} className="h-7 text-xs">
