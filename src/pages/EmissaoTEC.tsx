@@ -119,18 +119,19 @@ const EmissaoTEC = () => {
       return;
     }
     const updated = [...parcelas];
+    const valorCalc = updated[idx].qtdCotas * recente.valor;
     updated[idx] = {
       ...updated[idx],
-      valorPagar: (updated[idx].qtdCotas * recente.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
-      dataCotaUtilizada: recente.data,
+      cotacao: recente.valor,
+      dataCotacao: recente.data,
+      valorRS: valorCalc,
       calculado: true,
     };
     setParcelas(updated);
-    // Primeira parcela calculada → status "Em andamento"
     if (status === "TEC emitido" && !parcelas.some(p => p.calculado)) {
       setStatus("Em andamento");
     }
-    toast({ title: "Parcela calculada", description: `Valor atualizado com cota de ${recente.data} (fonte: BB RF CP Automático)` });
+    toast({ title: "Parcela calculada", description: `Valor: ${valorCalc.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} (cota: ${recente.valor} de ${recente.data})` });
   };
 
   const updateParcela = (idx: number, field: keyof Parcela, value: string) => {
