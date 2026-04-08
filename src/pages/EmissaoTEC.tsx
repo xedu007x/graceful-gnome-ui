@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Save, Send, FileText, Calculator } from "lucide-react";
+import { Search, Save, Send, FileText, Calculator, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getCotaMaisRecente, getCotaPorData, getCotas } from "@/lib/cotasStore";
 
