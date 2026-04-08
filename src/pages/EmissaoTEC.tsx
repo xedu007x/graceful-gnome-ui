@@ -21,11 +21,13 @@ interface Parcela {
   numero: number;
   qtdCotas: number;
   vencimento: string;
-  dataPagamento: string;
-  dataComunicacao: string;
-  valorPagar: string;
-  dataCotaUtilizada: string;
-  observacoes: string;
+  cotacao: number;
+  dataCotacao: string;
+  valorRS: number;
+  preenchimentoSigam: string;
+  dataPgto: string;
+  valorPago: number;
+  comunicadoSigam: string;
   calculado: boolean;
 }
 
