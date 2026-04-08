@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Save, Send, FileText, Calculator } from "lucide-react";
+import { Search, Save, Send, FileText, Calculator, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getCotaMaisRecente, getCotaPorData, getCotas } from "@/lib/cotasStore";
 
@@ -175,6 +175,20 @@ const EmissaoTEC = () => {
             {statusConfig[status]?.icon} {status}
           </Badge>
         </div>
+
+        {/* Botões de download - visíveis após TEC emitido */}
+        {["TEC emitido", "Em andamento", "Em atraso", "Encerrado"].includes(status) && (
+          <div className="flex gap-3">
+            <Button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-6">
+              <Download className="h-4 w-4 mr-2" />
+              Baixar Termo em PDF
+            </Button>
+            <Button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-6">
+              <Download className="h-4 w-4 mr-2" />
+              Baixar Termo em Word
+            </Button>
+          </div>
+        )}
 
         {/* Busca de contrato */}
         {!contratoSelecionado && (
