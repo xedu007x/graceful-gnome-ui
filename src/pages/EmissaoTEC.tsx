@@ -69,7 +69,8 @@ const EmissaoTEC = () => {
   const cotaDataAtualizacaoVal = cotaAtual?.valor || 0;
   const fonteCota = cotaBase?.fonte || "Sem dados";
 
-  const qtdTotalCotas = valorHistorico && cotaDataBaseVal ? (parseFloat(valorHistorico) / cotaDataBaseVal) : 0;
+  const valorHistoricoNum = valorHistorico ? parseFloat(valorHistorico.replace(/\./g, "").replace(",", ".")) : 0;
+  const qtdTotalCotas = valorHistoricoNum && cotaDataBaseVal ? (valorHistoricoNum / cotaDataBaseVal) : 0;
   const valorCorrigido = qtdTotalCotas * cotaDataAtualizacaoVal;
   const qtdCotasMensais = numParcelas ? qtdTotalCotas / parseInt(numParcelas) : 0;
 
@@ -235,7 +236,21 @@ const EmissaoTEC = () => {
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <Label className="text-xs">Valor histórico a devolver (R$) <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
-                  <Input type="number" value={valorHistorico} onChange={e => setValorHistorico(e.target.value)} disabled={bloqueado} placeholder="0,00" />
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    value={valorHistorico}
+                    onChange={e => {
+                      const raw = e.target.value.replace(/[^\d]/g, "");
+                      if (!raw) { setValorHistorico(""); return; }
+                      const num = (parseInt(raw) / 100).toFixed(2);
+                      const [intPart, decPart] = num.split(".");
+                      const formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + decPart;
+                      setValorHistorico(formatted);
+                    }}
+                    disabled={bloqueado}
+                    placeholder="0,00"
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Data base <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
