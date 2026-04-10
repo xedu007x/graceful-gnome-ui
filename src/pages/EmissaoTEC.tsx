@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Save, Send, FileText, Calculator, Download } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Search, Save, Send, FileText, Calculator, Download, Eraser, PauseCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getCotaMaisRecente, getCotaPorData, getCotas } from "@/lib/cotasStore";
 
@@ -40,9 +42,11 @@ const EmissaoTEC = () => {
   const [dataBase, setDataBase] = useState("");
   const [dataAtualizacao, setDataAtualizacao] = useState("");
   const [numParcelas, setNumParcelas] = useState("");
-  const [diaVencimento, setDiaVencimento] = useState("");
   const [status, setStatus] = useState("Em negociação");
   const [parcelas, setParcelas] = useState<Parcela[]>([]);
+  const [motivoSuspensao, setMotivoSuspensao] = useState("");
+  const [motivoSuspensaoInput, setMotivoSuspensaoInput] = useState("");
+  const [showSuspenderModal, setShowSuspenderModal] = useState(false);
 
   const contratosMatch = busca.length >= 2
     ? contratosmock.filter(c =>
@@ -52,14 +56,12 @@ const EmissaoTEC = () => {
       )
     : [];
 
-  // Busca cota pela data base no store de cotas diárias
   const getCotaValorPorData = (dataISO: string): { valor: number; fonte: string } | null => {
     if (!dataISO) return null;
     const [y, m, d] = dataISO.split("-");
     const dataFormatada = `${d}/${m}/${y}`;
     const cota = getCotaPorData(dataFormatada);
     if (cota) return { valor: cota.valor, fonte: "BB RF CP Automático - CNPJ: 42.592.315/0001-15" };
-    // Fallback: cota mais recente
     const recente = getCotaMaisRecente();
     if (recente) return { valor: recente.valor, fonte: `BB RF CP Automático (${recente.data})` };
     return null;
@@ -78,7 +80,6 @@ const EmissaoTEC = () => {
 
   const gerarParcelas = (num: string) => {
     setNumParcelas(num);
-    // Parcelas só são geradas ao clicar em "Gerar TEC"
   };
 
   const gerarGridParcelas = () => {
@@ -87,7 +88,7 @@ const EmissaoTEC = () => {
       toast({ title: "Erro", description: "Preencha o valor histórico, data base e número de parcelas antes de gerar.", variant: "destructive" });
       return;
     }
-    const dia = diaVencimento ? parseInt(diaVencimento) : 20;
+    const dia = 20;
     const cotasMensais = qtdTotalCotas / n;
     const hoje = new Date();
     setParcelas(
@@ -134,6 +135,19 @@ const EmissaoTEC = () => {
     toast({ title: "Parcela calculada", description: `Valor: ${valorCalc.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} (cota: ${recente.valor} de ${recente.data})` });
   };
 
+  const limparParcela = (idx: number) => {
+    const updated = [...parcelas];
+    updated[idx] = {
+      ...updated[idx],
+      cotacao: 0,
+      dataCotacao: "",
+      valorRS: 0,
+      calculado: false,
+    };
+    setParcelas(updated);
+    toast({ title: "Parcela limpa", description: `Parcela ${idx + 1} foi resetada para recalcular.` });
+  };
+
   const updateParcela = (idx: number, field: keyof Parcela, value: string) => {
     const updated = [...parcelas];
     updated[idx] = { ...updated[idx], [field]: value };
@@ -150,12 +164,24 @@ const EmissaoTEC = () => {
     toast({ title: "Emissão solicitada", description: "Status: Em formalização. Aguardando GESUP1." });
   };
 
+  const handleSuspender = () => {
+    if (!motivoSuspensaoInput.trim()) {
+      toast({ title: "Erro", description: "Informe o motivo da suspensão.", variant: "destructive" });
+      return;
+    }
+    setMotivoSuspensao(motivoSuspensaoInput.trim());
+    setStatus("Suspenso");
+    setShowSuspenderModal(false);
+    toast({ title: "TEC Suspenso", description: "O TEC foi suspenso com sucesso." });
+  };
+
   const statusConfig: Record<string, { color: string; icon: string }> = {
     "Em negociação": { color: "bg-gray-200 text-gray-800 border-gray-300", icon: "📝" },
     "Em formalização": { color: "bg-amber-100 text-amber-800 border-amber-300", icon: "📋" },
     "TEC emitido": { color: "bg-blue-100 text-blue-800 border-blue-300", icon: "📄" },
     "Em andamento": { color: "bg-emerald-100 text-emerald-800 border-emerald-300", icon: "▶️" },
     "Em atraso": { color: "bg-red-100 text-red-800 border-red-300", icon: "⚠️" },
+    "Suspenso": { color: "bg-orange-100 text-orange-800 border-orange-300", icon: "⏸️" },
     "Encerrado": { color: "bg-slate-200 text-slate-700 border-slate-400", icon: "✅" },
   };
 
@@ -176,8 +202,19 @@ const EmissaoTEC = () => {
           </Badge>
         </div>
 
-        {/* Botões de download - visíveis após TEC emitido */}
-        {["TEC emitido", "Em andamento", "Em atraso", "Encerrado"].includes(status) && (
+        {/* Motivo de suspensão em tela */}
+        {status === "Suspenso" && motivoSuspensao && (
+          <div className="bg-orange-50 border border-orange-300 rounded-lg p-4 flex items-start gap-3">
+            <PauseCircle className="h-5 w-5 text-orange-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-orange-800">TEC Suspenso</p>
+              <p className="text-sm text-orange-700 mt-1"><strong>Motivo:</strong> {motivoSuspensao}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Botões de download */}
+        {["TEC emitido", "Em andamento", "Em atraso", "Suspenso", "Encerrado"].includes(status) && (
           <div className="flex gap-3">
             <Button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-6">
               <Download className="h-4 w-4 mr-2" />
@@ -299,17 +336,6 @@ const EmissaoTEC = () => {
                   <Label className="text-xs">Qtde de cotas mensais <span className="text-green-600 text-[10px]">AUTO</span></Label>
                   <Input value={qtdCotasMensais ? qtdCotasMensais.toFixed(6) : ""} disabled className="bg-green-50" />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Dia de vencimento <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
-                  <Select value={diaVencimento} onValueChange={v => { setDiaVencimento(v); if (numParcelas) gerarParcelas(numParcelas); }} disabled={bloqueado}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 31 }, (_, i) => (
-                        <SelectItem key={i + 1} value={String(i + 1)}>{i + 1}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </div>
 
@@ -340,7 +366,7 @@ const EmissaoTEC = () => {
                         <TableHead>Data Pgto</TableHead>
                         <TableHead>Valor Pago</TableHead>
                         <TableHead>Comunicado SIGAM</TableHead>
-                        <TableHead className="w-24">Ações</TableHead>
+                        <TableHead className="w-32">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -368,9 +394,14 @@ const EmissaoTEC = () => {
                             <Input type="date" value={p.comunicadoSigam} onChange={e => updateParcela(idx, "comunicadoSigam", e.target.value)} className="h-8 text-xs" />
                           </TableCell>
                           <TableCell>
-                            <Button size="sm" variant="outline" onClick={() => calcularParcela(idx)} className="h-7 text-xs">
-                              <Calculator className="h-3 w-3 mr-1" /> Calc
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button size="sm" variant="outline" onClick={() => calcularParcela(idx)} className="h-7 text-xs">
+                                <Calculator className="h-3 w-3 mr-1" /> Calc
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => limparParcela(idx)} className="h-7 text-xs text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400" title="Limpar para recalcular">
+                                <Eraser className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -392,6 +423,11 @@ const EmissaoTEC = () => {
                   <FileText className="h-4 w-4 mr-1" /> Gerar TEC (GSUP1)
                 </Button>
               )}
+              {status === "Em andamento" && (
+                <Button onClick={() => { setMotivoSuspensaoInput(""); setShowSuspenderModal(true); }} className="bg-orange-600 hover:bg-orange-700 text-white">
+                  <PauseCircle className="h-4 w-4 mr-1" /> Suspender TEC
+                </Button>
+              )}
               {(status === "TEC emitido" || status === "Em andamento") && (
                 <Button onClick={() => { 
                   const todasCalculadas = parcelas.every(p => p.calculado);
@@ -408,6 +444,36 @@ const EmissaoTEC = () => {
             </div>
           </>
         )}
+
+        {/* Modal Suspender TEC */}
+        <Dialog open={showSuspenderModal} onOpenChange={setShowSuspenderModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <PauseCircle className="h-5 w-5 text-orange-600" />
+                Suspender TEC
+              </DialogTitle>
+              <DialogDescription>
+                Informe o motivo da suspensão do Termo de Encerramento Condicionado.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-2">
+              <Label className="text-sm font-medium">Motivo da Suspensão *</Label>
+              <Textarea
+                placeholder="Descreva o motivo da suspensão..."
+                value={motivoSuspensaoInput}
+                onChange={e => setMotivoSuspensaoInput(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowSuspenderModal(false)}>Cancelar</Button>
+              <Button onClick={handleSuspender} className="bg-orange-600 hover:bg-orange-700 text-white">
+                Confirmar Suspensão
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
