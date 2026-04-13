@@ -344,7 +344,7 @@ const EmissaoTEC = () => {
                     id="contemAnexos"
                     checked={contemAnexos}
                     onCheckedChange={(checked) => setContemAnexos(checked === true)}
-                    disabled={bloqueado}
+                    disabled={status === "Em negociação"}
                   />
                   <Label htmlFor="contemAnexos" className="text-xs font-medium cursor-pointer">Contém Anexos?</Label>
                 </div>
