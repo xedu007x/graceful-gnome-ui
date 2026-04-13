@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Search, Save, Send, FileText, Calculator, Download, Eraser, PauseCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getCotaMaisRecente, getCotaPorData, getCotas } from "@/lib/cotasStore";
