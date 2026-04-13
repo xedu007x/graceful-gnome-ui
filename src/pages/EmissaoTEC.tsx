@@ -48,6 +48,8 @@ const EmissaoTEC = () => {
   const [motivoSuspensao, setMotivoSuspensao] = useState("");
   const [motivoSuspensaoInput, setMotivoSuspensaoInput] = useState("");
   const [showSuspenderModal, setShowSuspenderModal] = useState(false);
+  const [contemAnexos, setContemAnexos] = useState(false);
+  const [textoAnexo, setTextoAnexo] = useState("");
 
   const contratosMatch = busca.length >= 2
     ? contratosmock.filter(c =>
