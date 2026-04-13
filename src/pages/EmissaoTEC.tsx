@@ -355,7 +355,7 @@ const EmissaoTEC = () => {
                   <Textarea
                     value={textoAnexo}
                     onChange={e => setTextoAnexo(e.target.value)}
-                    disabled={bloqueado}
+                    disabled={status === "Em negociação"}
                     placeholder="Insira o texto da cláusula referente aos anexos..."
                     rows={4}
                   />
