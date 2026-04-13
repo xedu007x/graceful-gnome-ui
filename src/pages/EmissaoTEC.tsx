@@ -339,7 +339,28 @@ const EmissaoTEC = () => {
                   <Label className="text-xs">Qtde de cotas mensais <span className="text-green-600 text-[10px]">AUTO</span></Label>
                   <Input value={qtdCotasMensais ? qtdCotasMensais.toFixed(6) : ""} disabled className="bg-green-50" />
                 </div>
+                <div className="flex items-center space-x-2 self-end pb-1">
+                  <Checkbox
+                    id="contemAnexos"
+                    checked={contemAnexos}
+                    onCheckedChange={(checked) => setContemAnexos(checked === true)}
+                    disabled={bloqueado}
+                  />
+                  <Label htmlFor="contemAnexos" className="text-xs font-medium cursor-pointer">Contém Anexos?</Label>
+                </div>
               </div>
+              {contemAnexos && (
+                <div className="space-y-1 mt-2">
+                  <Label className="text-xs">Texto do Anexo (será impresso no termo) <span className="text-blue-500 text-[10px]">MANUAL</span></Label>
+                  <Textarea
+                    value={textoAnexo}
+                    onChange={e => setTextoAnexo(e.target.value)}
+                    disabled={bloqueado}
+                    placeholder="Insira o texto da cláusula referente aos anexos..."
+                    rows={4}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Fluxo de parcelas inline */}
